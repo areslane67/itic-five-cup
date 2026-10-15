@@ -20,7 +20,7 @@ function Layout() {
     <div className="wrap">
       <header className="bar">
         <button className="logo" onClick={() => nav('/')} aria-label="Accueil ITIC Five Cup">
-          <span className="crest" />
+          <img className="crest" src="/logo.png" alt="" width="48" height="48" />
           <span>ITIC<small>PARIS</small></span>
         </button>
         <span style={{ color: 'var(--mute)', fontSize: 13 }}>BDE ITIC Paris</span>

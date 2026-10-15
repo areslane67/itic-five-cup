@@ -9,7 +9,7 @@ p{margin:0}
 header.bar{display:flex;align-items:center;justify-content:space-between;padding:6px 0 18px}
 .logo{display:flex;align-items:center;gap:10px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:26px;letter-spacing:.08em;color:var(--gold);cursor:pointer;border:0;background:none;padding:0}
 .logo small{display:block;font:600 9px Barlow;letter-spacing:.3em;color:var(--mute)}
-.crest{width:34px;height:40px;border:2px solid var(--gold);border-radius:3px 3px 50% 50%/3px 3px 70% 70%}
+.crest{width:48px;height:48px;border-radius:50%;display:block}
 .link{background:none;border:0;color:var(--mute);font:inherit;cursor:pointer;padding:8px 0;text-decoration:underline;text-underline-offset:3px}
 .hero{position:relative;overflow:hidden;border-radius:6px;padding:28px 22px 26px;margin-bottom:22px;background:#0d0d0c;border:1px solid var(--line)}
 .hero::before{content:"";position:absolute;inset:0;background:
