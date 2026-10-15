@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { useEvent, useReg } from '../state.jsx';
@@ -14,6 +14,16 @@ export default function FormPage({ backTo, title, sub, step, kind, promo, extra,
   const [e, setE] = useState({});
   const [busy, setBusy] = useState(false);
   const set = (k, v) => setD((x) => ({ ...x, [k]: v }));
+
+  // En cas d'erreur, fait défiler jusqu'à la première et place le curseur dans le champ concerné
+  useEffect(() => {
+    if (!Object.keys(e).length) return;
+    const el = document.querySelector('main .toast, main .err');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const field = el.previousElementSibling;
+    if (field?.matches('input[type=text], select')) field.focus({ preventScroll: true });
+  }, [e]);
 
   async function submit() {
     const err = {};
