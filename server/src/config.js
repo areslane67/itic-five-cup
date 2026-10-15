@@ -22,5 +22,11 @@ export const config = {
   jwtSecret: required('JWT_SECRET', 'dev-secret-a-remplacer'),
   adminPassword: required('ADMIN_PASSWORD', 'bde'),
   cookieSecure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : prod,
-  databaseUrl: required('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/itic'),
+  db: {
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: Number(process.env.DB_PORT) || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'itic',
+  },
 };

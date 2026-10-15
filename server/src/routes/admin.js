@@ -31,9 +31,9 @@ adminRouter.post('/logout', (_req, res) => {
 adminRouter.use(requireAdmin);
 
 const PEOPLE_SQL = `
-SELECT p.id, p.first_name AS "firstName", p.last_name AS "lastName", p.promo, p.class_name AS "className",
-       p.level, p.contact, p.mode, p.status, p.team_id AS "teamId", p.created_at AS "createdAt",
-       t.name AS "teamName", t.code AS "teamCode"
+SELECT p.id, p.first_name AS firstName, p.last_name AS lastName, p.promo, p.class_name AS className,
+       p.level, p.contact, p.mode, p.status, p.team_id AS teamId, p.created_at AS createdAt,
+       t.name AS teamName, t.code AS teamCode
 FROM participants p LEFT JOIN teams t ON t.id = p.team_id`;
 
 adminRouter.get('/dashboard', ah(async (_req, res) => {
@@ -65,7 +65,7 @@ adminRouter.patch('/event', ah(async (req, res) => {
     })
     .parse(req.body);
   const next = { ...(await getEvent()), ...b };
-  await query('UPDATE event SET registrations_open = ?, "date" = ?, venue = ?, price = ? WHERE id = 1', [
+  await query('UPDATE event SET registrations_open = ?, `date` = ?, venue = ?, price = ? WHERE id = 1', [
     next.registrationsOpen ? 1 : 0, next.date, next.venue, next.price,
   ]);
   res.json(await getEvent());
