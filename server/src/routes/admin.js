@@ -86,7 +86,7 @@ const assign = (personId, teamId) =>
     const [t] = await fetchTeams('WHERE t.id = ?', [teamId], c, 'FOR UPDATE');
     if (!t) throw new HttpError(404, 'not_found', 'Équipe introuvable.');
     if (t.promo !== p.promo) throw new HttpError(400, 'promo_mismatch', 'Les promotions ne correspondent pas.');
-    if (t.closed) throw new HttpError(409, 'team_closed', 'Cette équipe est fermée.');
+    // Une équipe fermée n'accepte plus de demandes publiques, mais le BDE peut encore y affecter un joueur
     if (t.count >= t.max) throw new HttpError(409, 'team_full', 'Cette équipe est complète.');
     await query(`UPDATE participants SET team_id = ?, mode = 'team_member' WHERE id = ?`, [teamId, personId], c);
   });

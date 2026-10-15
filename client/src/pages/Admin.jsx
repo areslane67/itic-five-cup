@@ -179,8 +179,8 @@ Attention : ${captains} capitaine(s) sélectionné(s), leur équipe restera sans
                     <select aria-label={`Affecter ${x.firstName} ${x.lastName}`} value={x.teamId || ''}
                       onChange={(e) => act(api.admin.assign)(x.id, e.target.value ? Number(e.target.value) : null)}>
                       <option value="">{x.teamId ? 'Retirer (solo)' : 'À affecter…'}</option>
-                      {teams.filter((t) => t.promo === x.promo && (t.id === x.teamId || (!t.closed && t.count < t.max))).map((t) => (
-                        <option key={t.id} value={t.id}>{t.name}</option>
+                      {teams.filter((t) => t.promo === x.promo && (t.id === x.teamId || t.count < t.max)).map((t) => (
+                        <option key={t.id} value={t.id}>{t.name} ({t.count}/{t.max}){t.closed ? ' · fermée' : ''}</option>
                       ))}
                     </select>
                   )}
