@@ -60,12 +60,12 @@ export const register = (v) =>
       manageToken = secret(24);
       try {
         const r = await query(
-          'INSERT INTO teams (name, promo, code, manage_token, max_players) VALUES (?, ?, ?, ?, ?)',
+          'INSERT INTO teams (name, promo, code, manage_token, max_players) VALUES (?, ?, ?, ?, ?) RETURNING id',
           [v.teamName, v.promo, code, manageToken, v.teamSize], c
         );
-        team = { id: r.insertId, name: v.teamName, code };
+        team = { id: r[0].id, name: v.teamName, code };
       } catch (e) {
-        if (e.code === 'ER_DUP_ENTRY') {
+        if (e.code === '23505') {
           throw new HttpError(409, 'team_name_taken', 'Ce nom existe déjà dans ta promotion. Choisis-en un autre.');
         }
         throw e;

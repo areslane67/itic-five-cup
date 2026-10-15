@@ -68,3 +68,5 @@ app.use((err, _req, res, _next) => {
 
 await checkDatabase();
 app.listen(config.port, () => console.log(`ITIC Five Cup — API prête sur http://localhost:${config.port}`));
+
+export default app;

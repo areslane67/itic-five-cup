@@ -16,7 +16,7 @@ captainRouter.get('/captain/:token', ah(async (req, res) => {
   if (!team) throw invalidLink();
 
   const people = await query(
-    `SELECT id, first_name AS firstName, last_name AS lastName, class_name AS className, level, mode, status
+    `SELECT id, first_name AS "firstName", last_name AS "lastName", class_name AS "className", level, mode, status
      FROM participants WHERE team_id = ? AND status IN ('pre_registered','pending')
      ORDER BY created_at, id`,
     [team.id]
@@ -62,7 +62,7 @@ captainRouter.get('/tracking/:token', ah(async (req, res) => {
   const token = TOKEN.safeParse(req.params.token);
   if (!token.success) throw invalidLink();
   const [p] = await query(
-    `SELECT p.first_name AS firstName, p.last_name AS lastName, p.promo, p.mode, p.status, t.name AS teamName
+    `SELECT p.first_name AS "firstName", p.last_name AS "lastName", p.promo, p.mode, p.status, t.name AS "teamName"
      FROM participants p LEFT JOIN teams t ON t.id = p.team_id WHERE p.track_token = ?`,
     [token.data]
   );
