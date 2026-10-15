@@ -65,5 +65,8 @@ export const toPublicTeam = (t) => ({
 
 export async function getEvent(conn = pool) {
   const [e] = await query('SELECT * FROM event WHERE id = 1', [], conn);
-  return { registrationsOpen: !!e.registrations_open, date: e.date, venue: e.venue, price: e.price };
+  return {
+    registrationsOpen: !!e.registrations_open, date: e.date, venue: e.venue, price: e.price,
+    bts1Tagline: e.bts1_tagline, bts2Tagline: e.bts2_tagline,
+  };
 }

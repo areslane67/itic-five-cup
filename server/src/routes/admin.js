@@ -62,12 +62,15 @@ adminRouter.patch('/event', ah(async (req, res) => {
       date: z.string().trim().max(100).optional(),
       venue: z.string().trim().max(150).optional(),
       price: z.string().trim().max(60).optional(),
+      bts1Tagline: z.string().trim().max(60).optional(),
+      bts2Tagline: z.string().trim().max(60).optional(),
     })
     .parse(req.body);
   const next = { ...(await getEvent()), ...b };
-  await query('UPDATE event SET registrations_open = ?, "date" = ?, venue = ?, price = ? WHERE id = 1', [
-    next.registrationsOpen ? 1 : 0, next.date, next.venue, next.price,
-  ]);
+  await query(
+    'UPDATE event SET registrations_open = ?, "date" = ?, venue = ?, price = ?, bts1_tagline = ?, bts2_tagline = ? WHERE id = 1',
+    [next.registrationsOpen ? 1 : 0, next.date, next.venue, next.price, next.bts1Tagline, next.bts2Tagline]
+  );
   res.json(await getEvent());
 }));
 

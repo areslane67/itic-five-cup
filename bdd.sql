@@ -14,8 +14,14 @@ CREATE TABLE IF NOT EXISTS event (
   "date"             VARCHAR(100) NOT NULL DEFAULT '',
   venue              VARCHAR(150) NOT NULL DEFAULT '',
   price              VARCHAR(60)  NOT NULL DEFAULT '',
+  bts1_tagline       VARCHAR(60)  NOT NULL DEFAULT 'Les challengers',      -- slogan affiché sous « BTS 1 »
+  bts2_tagline       VARCHAR(60)  NOT NULL DEFAULT 'Les tenants du titre', -- slogan affiché sous « BTS 2 »
   PRIMARY KEY (id)
 );
+
+-- Bases créées avant l'ajout des slogans
+ALTER TABLE event ADD COLUMN IF NOT EXISTS bts1_tagline VARCHAR(60) NOT NULL DEFAULT 'Les challengers';
+ALTER TABLE event ADD COLUMN IF NOT EXISTS bts2_tagline VARCHAR(60) NOT NULL DEFAULT 'Les tenants du titre';
 
 INSERT INTO event (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 

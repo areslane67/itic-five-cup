@@ -31,7 +31,10 @@ function Login({ onDone }) {
 }
 
 function EventForm({ event, onSave }) {
-  const [v, setV] = useState({ date: event.date, venue: event.venue, price: event.price });
+  const [v, setV] = useState({
+    date: event.date, venue: event.venue, price: event.price,
+    bts1Tagline: event.bts1Tagline, bts2Tagline: event.bts2Tagline,
+  });
   const [saved, setSaved] = useState(false);
   const field = (k, label, ph) => (
     <>
@@ -45,6 +48,8 @@ function EventForm({ event, onSave }) {
       {field('date', 'Date', 'Ex. Samedi 14 juin, 14h')}
       {field('venue', 'Lieu', 'Ex. Five de Paris 12e')}
       {field('price', 'Prix', 'Ex. Gratuit')}
+      {field('bts1Tagline', 'Slogan BTS 1', 'Ex. Les challengers')}
+      {field('bts2Tagline', 'Slogan BTS 2', 'Ex. Les tenants du titre')}
       <div className="row" style={{ marginTop: 14 }}>
         <button className="btn sm" onClick={async () => { await onSave(v); setSaved(true); }}>Enregistrer</button>
         {saved && <span className="ok-msg">Enregistré ✓</span>}
@@ -107,7 +112,7 @@ export default function Admin() {
         <span className="tag">{stats.openTeams} équipes ouvertes · {stats.fullTeams} complète(s) · {stats.pending} demande(s) en attente</span>
       </div>
 
-      <EventForm key={`${event.date}|${event.venue}|${event.price}`} event={event} onSave={act((v) => api.admin.updateEvent(v))} />
+      <EventForm key={`${event.date}|${event.venue}|${event.price}|${event.bts1Tagline}|${event.bts2Tagline}`} event={event} onSave={act((v) => api.admin.updateEvent(v))} />
 
       <div className="row" style={{ justifyContent: 'space-between', margin: '28px 0 4px' }}>
         <h3 style={{ fontSize: 28 }}>Participants</h3>
