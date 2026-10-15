@@ -76,6 +76,10 @@ const assign = (personId, teamId) =>
     const [p] = await query(`SELECT * FROM participants WHERE id = ? AND status = 'pre_registered' FOR UPDATE`, [personId], c);
     if (!p) throw new HttpError(404, 'not_found', 'Participant introuvable.');
     if (p.mode === 'captain') throw new HttpError(400, 'captain', 'Un capitaine ne peut pas être déplacé.');
+    if (teamId === null) {
+      await query(`UPDATE participants SET team_id = NULL, mode = 'solo' WHERE id = ?`, [personId], c);
+      return;
+    }
     const [t] = await fetchTeams('WHERE t.id = ?', [teamId], c, 'FOR UPDATE');
     if (!t) throw new HttpError(404, 'not_found', 'Équipe introuvable.');
     if (t.promo !== p.promo) throw new HttpError(400, 'promo_mismatch', 'Les promotions ne correspondent pas.');
@@ -86,7 +90,7 @@ const assign = (personId, teamId) =>
 
 adminRouter.patch('/participants/:id', ah(async (req, res) => {
   const id = z.coerce.number().int().positive().parse(req.params.id);
-  const { teamId } = z.object({ teamId: z.number().int().positive() }).parse(req.body);
+  const { teamId } = z.object({ teamId: z.number().int().positive().nullable() }).parse(req.body);
   await assign(id, teamId);
   res.json({ ok: true });
 }));

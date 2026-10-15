@@ -128,10 +128,12 @@ export default function Admin() {
                 <td>{x.promo}</td>
                 <td>{x.status === 'pending' ? 'Demande' : MODE[x.mode]}</td>
                 <td>
-                  {x.teamName ? x.teamName : (
-                    <select aria-label={`Affecter ${x.firstName} ${x.lastName}`} value="" onChange={(e) => e.target.value && act(api.admin.assign)(x.id, Number(e.target.value))}>
-                      <option value="">À affecter…</option>
-                      {teams.filter((t) => t.promo === x.promo && !t.closed && t.count < t.max).map((t) => (
+                  {/* Capitaines et demandes en attente : équipe non modifiable ici */}
+                  {x.mode === 'captain' || x.status === 'pending' ? x.teamName : (
+                    <select aria-label={`Affecter ${x.firstName} ${x.lastName}`} value={x.teamId || ''}
+                      onChange={(e) => act(api.admin.assign)(x.id, e.target.value ? Number(e.target.value) : null)}>
+                      <option value="">{x.teamId ? 'Retirer (solo)' : 'À affecter…'}</option>
+                      {teams.filter((t) => t.promo === x.promo && (t.id === x.teamId || (!t.closed && t.count < t.max))).map((t) => (
                         <option key={t.id} value={t.id}>{t.name}</option>
                       ))}
                     </select>
