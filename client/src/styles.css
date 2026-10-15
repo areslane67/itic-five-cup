@@ -44,6 +44,7 @@ header.bar{display:flex;align-items:center;justify-content:space-between;padding
 .opt.mode h3{font-size:26px}
 label{display:block;font-size:14px;color:var(--mute);margin:16px 0 6px}
 input[type=text],input[type=password],select{width:100%;min-height:48px;padding:0 14px;border-radius:6px;border:1px solid var(--line);background:#fff;color:#111;font:500 16px Barlow,sans-serif}
+select{background:rgba(128,128,128,.4);color:#fff}select option{background:#2a2a2a;color:#fff}
 .err{color:var(--err);font-size:14px;margin-top:6px}
 .chk{display:flex;gap:12px;align-items:flex-start;margin:20px 0;font-size:14px;color:var(--ink)}
 .chk input{width:22px;height:22px;accent-color:#d9f03d;flex:none;margin:0}

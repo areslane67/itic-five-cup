@@ -23,17 +23,7 @@ function Layout() {
           <span className="crest" />
           <span>ITIC<small>PARIS</small></span>
         </button>
-        <span
-          style={{
-            color: 'var(--mute)',
-            fontSize: 13,
-            textDecoration: 'underline',
-            textDecorationColor: 'red',
-            textUnderlineOffset: 4,
-          }}
-        >
-          BDE ITIC Paris
-        </span>
+        <span style={{ color: 'var(--mute)', fontSize: 13 }}>BDE ITIC Paris</span>
       </header>
       <main><Outlet /></main>
       <p className="demo"><button className="link" onClick={() => nav('/admin')}>Accès BDE</button></p>
