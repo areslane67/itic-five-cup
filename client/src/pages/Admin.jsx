@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { useEvent } from '../state.jsx';
 import { Back, ErrorBox, Spinner } from '../ui.jsx';
@@ -60,6 +60,7 @@ export default function Admin() {
   const [err, setErr] = useState('');
   const [q, setQ] = useState('');
   const [fp, setFp] = useState('');
+  const [openTeam, setOpenTeam] = useState(null); // équipe dont on affiche les joueurs
 
   const load = useCallback(async () => {
     try { setData(await api.admin.dashboard()); setAuth('in'); }
@@ -120,12 +121,13 @@ export default function Admin() {
       </div>
       <div className="tw">
         <table>
-          <thead><tr><th>Nom</th><th>Promo</th><th>Mode</th><th>Équipe</th><th></th></tr></thead>
+          <thead><tr><th>Nom</th><th>Promo</th><th>Niveau</th><th>Mode</th><th>Équipe</th><th></th></tr></thead>
           <tbody>
             {rows.map((x) => (
               <tr key={x.id}>
                 <td>{x.firstName} {x.lastName}</td>
                 <td>{x.promo}</td>
+                <td>{x.level || '—'}</td>
                 <td>{x.status === 'pending' ? 'Demande' : MODE[x.mode]}</td>
                 <td>
                   {/* Capitaines et demandes en attente : équipe non modifiable ici */}
@@ -156,8 +158,15 @@ export default function Admin() {
           <thead><tr><th>Équipe</th><th>Promo</th><th>Effectif</th><th>Code</th><th></th></tr></thead>
           <tbody>
             {teams.map((t) => (
-              <tr key={t.id}>
-                <td>{t.name}</td><td>{t.promo}</td><td>{t.count}/{t.max}</td><td>{t.code}</td>
+              <Fragment key={t.id}>
+              <tr>
+                <td>
+                  <button className="link" style={{ color: 'var(--ink)', fontWeight: 600, padding: 0 }} aria-expanded={openTeam === t.id}
+                    onClick={() => setOpenTeam(openTeam === t.id ? null : t.id)}>
+                    {openTeam === t.id ? '▾' : '▸'} {t.name}
+                  </button>
+                </td>
+                <td>{t.promo}</td><td>{t.count}/{t.max}</td><td>{t.code}</td>
                 <td>
                   <div className="row">
                     <button className="team-btn" onClick={act(() => api.admin.setTeamClosed(t.id, !t.closed))}>
@@ -169,6 +178,22 @@ export default function Admin() {
                   </div>
                 </td>
               </tr>
+              {openTeam === t.id && (
+                <tr>
+                  <td colSpan={5}>
+                    <div className="recap" style={{ margin: '4px 0 8px' }}>
+                      {participants.filter((p) => p.teamId === t.id).map((p) => (
+                        <div key={p.id}>
+                          <b>{p.firstName} {p.lastName}{p.mode === 'captain' ? ' (capitaine)' : ''}{p.status === 'pending' ? ' (demande en attente)' : ''}</b>
+                          <span>{p.level || 'Niveau non renseigné'}</span>
+                        </div>
+                      ))}
+                      {!participants.some((p) => p.teamId === t.id) && <div><span>Aucun joueur</span></div>}
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>

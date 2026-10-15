@@ -9,6 +9,7 @@ export default function TeamList() {
   const { promo } = useReg();
   const [teams, setTeams] = useState(null);
   const [error, setError] = useState('');
+  const [code, setCode] = useState('');
 
   useEffect(() => {
     if (!promo) return;
@@ -22,7 +23,14 @@ export default function TeamList() {
       <Back to="/inscription" />
       <Progress step={3} />
       <h2>Rejoins une équipe</h2>
-      <p className="sub">Équipes ouvertes en {promo}. Choisis ton équipe : son capitaine devra valider ta demande.</p>
+      <p className="sub">Saisis le code d’invitation donné par ton capitaine, ou choisis une équipe ouverte en {promo}. Le capitaine devra valider ta demande.</p>
+      <form className="row" style={{ marginBottom: 22 }}
+        onSubmit={(e) => { e.preventDefault(); if (code.trim()) nav('/equipe/' + code.trim().toUpperCase()); }}>
+        <input type="text" placeholder="Code d’invitation (ex. 8BQRFN)" aria-label="Code d’invitation" maxLength={12}
+          value={code} onChange={(e) => setCode(e.target.value.replace(/[^A-Za-z0-9]/g, ''))}
+          style={{ flex: 1, minWidth: 160, textTransform: 'uppercase' }} />
+        <button className="btn sm" style={{ minHeight: 48 }} disabled={code.trim().length < 3}>Valider</button>
+      </form>
       <ErrorBox>{error}</ErrorBox>
       {!teams && !error && <Spinner />}
       {teams && teams.map((t) => {

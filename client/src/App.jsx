@@ -26,7 +26,7 @@ function Layout() {
         <span style={{ color: 'var(--mute)', fontSize: 13 }}>BDE ITIC Paris</span>
       </header>
       <main><Outlet /></main>
-      <p className="demo"><button className="link" onClick={() => nav('/admin')}>Accès BDE</button></p>
+      {pathname === '/' &&<p className="demo"><button className="link" onClick={() => nav('/admin')}>Accès BDE</button></p>}
     </div>
   );
 }
