@@ -66,6 +66,8 @@ export default function Admin() {
   const [q, setQ] = useState('');
   const [fp, setFp] = useState('');
   const [openTeam, setOpenTeam] = useState(null); // équipe dont on affiche les joueurs
+  const [sel, setSel] = useState(() => new Set()); // participants cochés
+  const [tsel, setTsel] = useState(() => new Set()); // équipes cochées
 
   const load = useCallback(async () => {
     try { setData(await api.admin.dashboard()); setAuth('in'); }
@@ -87,6 +89,32 @@ export default function Admin() {
   const rows = participants.filter(
     (x) => (!fp || x.promo === fp) && (!q || `${x.firstName} ${x.lastName}`.toLowerCase().includes(q.toLowerCase()))
   );
+  // Seules les lignes visibles (recherche / filtre) comptent dans la sélection
+  const picked = rows.filter((x) => sel.has(x.id));
+  const allPicked = rows.length > 0 && picked.length === rows.length;
+  const toggle = (id) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const toggleAll = () => setSel(allPicked ? new Set() : new Set(rows.map((x) => x.id)));
+  const tpicked = teams.filter((t) => tsel.has(t.id));
+  const allTeams = teams.length > 0 && tpicked.length === teams.length;
+  const toggleTeam = (id) => setTsel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const deleteTeams = (list) => {
+    const names = list.map((t) => t.name).join(', ');
+    const msg = `Supprimer définitivement ${list.length > 1 ? `ces ${list.length} équipes` : 'l’équipe'} : ${names} ?
+
+` +
+      'Les joueurs (capitaine compris) redeviendront solos à affecter, les demandes en attente seront refusées.';
+    if (!window.confirm(msg)) return;
+    act(async () => { await api.admin.deleteTeams(list.map((t) => t.id)); setTsel(new Set()); })();
+  };
+  const cancelPicked = () => {
+    const captains = picked.filter((x) => x.mode === 'captain').length;
+    const msg = `Supprimer ${picked.length} inscription(s) ?` +
+      (captains ? `
+
+Attention : ${captains} capitaine(s) sélectionné(s), leur équipe restera sans capitaine.` : '');
+    if (!window.confirm(msg)) return;
+    act(async () => { await api.admin.cancelMany(picked.map((x) => x.id)); setSel(new Set()); })();
+  };
 
   return (
     <>
@@ -124,12 +152,23 @@ export default function Admin() {
           <option value="">Toutes promos</option><option>BTS 1</option><option>BTS 2</option>
         </select>
       </div>
+      <div className="row" style={{ marginTop: 10, minHeight: 40 }}>
+        <span className="tag">{picked.length} sélectionné(s)</span>
+        <button className="btn alt sm" disabled={!picked.length} onClick={cancelPicked}>Supprimer la sélection</button>
+        {picked.length > 0 && <button className="link" onClick={() => setSel(new Set())}>Tout désélectionner</button>}
+      </div>
       <div className="tw">
         <table>
-          <thead><tr><th>Nom</th><th>Promo</th><th>Niveau</th><th>Mode</th><th>Équipe</th><th></th></tr></thead>
+          <thead><tr>
+            <th className="cb"><input type="checkbox" aria-label="Tout sélectionner" checked={allPicked}
+              ref={(el) => { if (el) el.indeterminate = picked.length > 0 && !allPicked; }} onChange={toggleAll} /></th>
+            <th>Nom</th><th>Promo</th><th>Niveau</th><th>Mode</th><th>Équipe</th><th></th>
+          </tr></thead>
           <tbody>
             {rows.map((x) => (
               <tr key={x.id}>
+                <td className="cb"><input type="checkbox" aria-label={`Sélectionner ${x.firstName} ${x.lastName}`}
+                  checked={sel.has(x.id)} onChange={() => toggle(x.id)} /></td>
                 <td>{x.firstName} {x.lastName}</td>
                 <td>{x.promo}</td>
                 <td>{x.level || '—'}</td>
@@ -158,13 +197,24 @@ export default function Admin() {
       </div>
 
       <h3 style={{ fontSize: 28, margin: '28px 0 4px' }}>Équipes</h3>
+      <div className="row" style={{ marginTop: 10, minHeight: 40 }}>
+        <span className="tag">{tpicked.length} sélectionnée(s)</span>
+        <button className="btn alt sm" disabled={!tpicked.length} onClick={() => deleteTeams(tpicked)}>Supprimer la sélection</button>
+        {tpicked.length > 0 && <button className="link" onClick={() => setTsel(new Set())}>Tout désélectionner</button>}
+      </div>
       <div className="tw">
         <table>
-          <thead><tr><th>Équipe</th><th>Promo</th><th>Effectif</th><th>Code</th><th></th></tr></thead>
+          <thead><tr>
+            <th className="cb"><input type="checkbox" aria-label="Sélectionner toutes les équipes" checked={allTeams}
+              ref={(el) => { if (el) el.indeterminate = tpicked.length > 0 && !allTeams; }}
+              onChange={() => setTsel(allTeams ? new Set() : new Set(teams.map((t) => t.id)))} /></th>
+            <th>Équipe</th><th>Promo</th><th>Effectif</th><th>Code</th><th></th></tr></thead>
           <tbody>
             {teams.map((t) => (
               <Fragment key={t.id}>
               <tr>
+                <td className="cb"><input type="checkbox" aria-label={`Sélectionner ${t.name}`}
+                  checked={tsel.has(t.id)} onChange={() => toggleTeam(t.id)} /></td>
                 <td>
                   <button className="link" style={{ color: 'var(--ink)', fontWeight: 600, padding: 0 }} aria-expanded={openTeam === t.id}
                     onClick={() => setOpenTeam(openTeam === t.id ? null : t.id)}>
@@ -180,12 +230,13 @@ export default function Admin() {
                     <button className="team-btn" onClick={() => window.prompt('Lien capitaine (à copier) :', `${window.location.origin}/capitaine/${t.manageToken}`)}>
                       Lien capitaine
                     </button>
+                    <button className="team-btn" onClick={() => deleteTeams([t])}>Supprimer</button>
                   </div>
                 </td>
               </tr>
               {openTeam === t.id && (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <div className="recap" style={{ margin: '4px 0 8px' }}>
                       {participants.filter((p) => p.teamId === t.id).map((p) => (
                         <div key={p.id}>

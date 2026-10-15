@@ -105,6 +105,35 @@ adminRouter.delete('/participants/:id', ah(async (req, res) => {
   res.json({ ok: true });
 }));
 
+// Annulation groupée (cases cochées dans le tableau des participants)
+adminRouter.post('/participants/cancel', ah(async (req, res) => {
+  const { ids } = z.object({ ids: z.array(z.number().int().positive()).min(1).max(1000) }).parse(req.body);
+  const r = await query(
+    `UPDATE participants SET status = 'cancelled' WHERE id = ANY(?::int[]) AND status IN ('pre_registered','pending')`,
+    [ids]
+  );
+  res.json({ ok: true, cancelled: r.affectedRows });
+}));
+
+// Suppression d'équipes : les joueurs (capitaine compris) redeviennent solos à affecter,
+// les demandes en attente sont refusées, puis l'équipe est effacée.
+adminRouter.post('/teams/delete', ah(async (req, res) => {
+  const { ids } = z.object({ ids: z.array(z.number().int().positive()).min(1).max(1000) }).parse(req.body);
+  const deleted = await withTx(async (c) => {
+    await query(
+      `UPDATE participants SET team_id = NULL, mode = 'solo' WHERE team_id = ANY(?::int[]) AND status = 'pre_registered'`,
+      [ids], c
+    );
+    await query(
+      `UPDATE participants SET team_id = NULL, status = 'rejected' WHERE team_id = ANY(?::int[]) AND status = 'pending'`,
+      [ids], c
+    );
+    await query('UPDATE participants SET team_id = NULL WHERE team_id = ANY(?::int[])', [ids], c);
+    return (await query('DELETE FROM teams WHERE id = ANY(?::int[])', [ids], c)).affectedRows;
+  });
+  res.json({ ok: true, deleted });
+}));
+
 adminRouter.patch('/teams/:id', ah(async (req, res) => {
   const id = z.coerce.number().int().positive().parse(req.params.id);
   const { closed } = z.object({ closed: z.boolean() }).parse(req.body);

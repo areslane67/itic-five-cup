@@ -44,6 +44,8 @@ export const api = {
     updateEvent: (patch) => request('/admin/event', { method: 'PATCH', body: patch }),
     assign: (id, teamId) => request('/admin/participants/' + id, { method: 'PATCH', body: { teamId } }),
     cancel: (id) => request('/admin/participants/' + id, { method: 'DELETE' }),
+    cancelMany: (ids) => request('/admin/participants/cancel', { method: 'POST', body: { ids } }),
+    deleteTeams: (ids) => request('/admin/teams/delete', { method: 'POST', body: { ids } }),
     setTeamClosed: (id, closed) => request('/admin/teams/' + id, { method: 'PATCH', body: { closed } }),
     exportUrl: '/api/admin/export.csv',
   },

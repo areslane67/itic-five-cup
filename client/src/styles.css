@@ -85,3 +85,4 @@ td select{min-height:34px;font-size:14px;padding:0 6px}
 a.btn{text-decoration:none}
 .btn:disabled{background:#2a2922;color:#6c675a;cursor:not-allowed}
 .btn.alt:disabled{background:transparent;border-color:var(--line)}
+.cb{width:30px}.cb input{width:18px;height:18px;accent-color:#d9f03d;margin:0;cursor:pointer}
